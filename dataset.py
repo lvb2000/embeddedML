@@ -37,13 +37,12 @@ class COCODataset(Dataset):
 
         # convert labels ratios to absolute box coordinates
         boxes = []
-        count = 0
+        #count = 0
         for label in labels:
-            if count > 1:
-                break
-            count += 1
+            if label["label"] != "person":
+                continue
             box = label["bounding_box"]
-            x,y = box[0]+box[2]/2, box[1]+box[3]/2
+            y,x = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
             boxes.append([1,x,y,w,h])
         boxes = torch.tensor(boxes)
