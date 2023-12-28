@@ -5,8 +5,39 @@ from torch.utils.data import Dataset
 import fiftyone as fo
 import fiftyone.zoo as foz
 from hparam import hparam as hp
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class COCODataset(Dataset):
+    def print_sample(self,img,boxes):
+        im = np.array(img)
+        height, width, _ = im.shape
+
+        # Create figure and axes
+        fig, ax = plt.subplots(1)
+        # Display the image
+        ax.imshow(im)
+
+        # box[0] is x midpoint, box[2] is width
+        # box[1] is y midpoint, box[3] is height
+
+        # Create a Rectangle potch
+        for box in boxes:
+            assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
+            upper_left_x = box[0]
+            upper_left_y = box[1]
+            rect = patches.Rectangle(
+                (upper_left_x * width, upper_left_y * height),
+                box[2] * width,
+                box[3] * height,
+                linewidth=1,
+                edgecolor="g",
+                facecolor="none",
+            )
+            # Add the patch to the Axes
+            ax.add_patch(rect)
+        plt.show()
+
     def get_index_dict(self):
         index_dict = {}
         for index,sample in enumerate(self.dataset):
@@ -45,6 +76,7 @@ class COCODataset(Dataset):
             y,x = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
             boxes.append([1,x,y,w,h])
+        self.print_sample(img, boxes)
         boxes = torch.tensor(boxes)
         if self.transform:
             img, boxes = self.transform(img,boxes)
