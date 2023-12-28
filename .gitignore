@@ -160,3 +160,8 @@ cython_debug/
 .idea/
 .DS_Store
 
+ai8x-training/
+ai8x-synthesis/
+Research/
+
+overfit.pth.tar
