@@ -11,6 +11,8 @@ import matplotlib.patches as patches
 class COCODataset(Dataset):
     def print_sample(self,img,boxes):
         im = np.array(img)
+        if len(im.shape) == 2:
+            im = np.repeat(im[:,:,np.newaxis],3,axis=2)
         height, width, _ = im.shape
 
         # Create figure and axes
@@ -23,9 +25,10 @@ class COCODataset(Dataset):
 
         # Create a Rectangle potch
         for box in boxes:
+            box = box[1:]
             assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
-            upper_left_x = box[0]
-            upper_left_y = box[1]
+            upper_left_x = box[0] - box[2] / 2
+            upper_left_y = box[1] - box[3] / 2
             rect = patches.Rectangle(
                 (upper_left_x * width, upper_left_y * height),
                 box[2] * width,
@@ -73,10 +76,10 @@ class COCODataset(Dataset):
             if label["label"] != "person":
                 continue
             box = label["bounding_box"]
-            y,x = box[0]+box[2]/2, box[1]+box[3]/2
+            x,y = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
             boxes.append([1,x,y,w,h])
-        self.print_sample(img, boxes)
+        #self.print_sample(img, boxes)
         boxes = torch.tensor(boxes)
         if self.transform:
             img, boxes = self.transform(img,boxes)
@@ -84,8 +87,8 @@ class COCODataset(Dataset):
         for box in boxes:
             class_label,x,y,width,height = box.tolist()
             class_label = int(class_label)
-            i,j = int(hp["S"]*x), int(hp["S"]*y)
-            x_cell,y_cell = hp["S"]*x-i, hp["S"]*y-j
+            i,j = int(hp["S"]*y),int(hp["S"]*x)
+            x_cell,y_cell = hp["S"]*x-j, hp["S"]*y-i
             width_cell,height_cell = width*hp["S"], height*hp["S"]
             if label_matrix[i,j,20] == 0:
                 label_matrix[i,j,20] = 1

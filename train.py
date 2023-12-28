@@ -62,7 +62,6 @@ def main():
         #load_checkpoint(torch.load(hp["load_model_file"],map_location=torch.device('cpu')), model, optimizer)
 
     train_dataset = COCODataset(transform=transform)
-    train_dataset.load_dataset()
     print(f"Training samples: {len(train_dataset)}")
     train_loader = DataLoader(dataset=train_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"], pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
 
