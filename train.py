@@ -71,8 +71,9 @@ def main():
             x = x.to(hp["device"])
             for idx in range(8):
                 bboxes = cellboxes_to_boxes(model(x))
+                real_boxes = cellboxes_to_boxes(y.flatten(start_dim=1))
                 bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
-                plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes)
+                plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes,real_boxes[idx])
 
             import sys
             sys.exit()

@@ -201,7 +201,7 @@ def mean_average_precision(
     return sum(average_precisions) / len(average_precisions)
 
 
-def plot_image(image, boxes):
+def plot_image(image, boxes, real_boxes=None):
     """Plots predicted bounding boxes on the image"""
     im = np.array(image)
     height, width, _ = im.shape
@@ -230,6 +230,23 @@ def plot_image(image, boxes):
         )
         # Add the patch to the Axes
         ax.add_patch(rect)
+
+    if real_boxes is not None:
+        for box in real_boxes:
+            box = box[2:]
+            assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
+            upper_left_x = box[0] - box[2] / 2
+            upper_left_y = box[1] - box[3] / 2
+            rect = patches.Rectangle(
+                (upper_left_x * width, upper_left_y * height),
+                box[2] * width,
+                box[3] * height,
+                linewidth=1,
+                edgecolor="g",
+                facecolor="none",
+            )
+            # Add the patch to the Axes
+            ax.add_patch(rect)
 
     plt.show()
 
