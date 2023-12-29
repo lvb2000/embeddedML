@@ -102,7 +102,7 @@ class YoloLoss(nn.Module):
             self.lambda_coord * box_loss # first two terms
             + object_loss # third term
             + self.lambda_noobj * no_object_loss # fourth term
-            + class_loss # fifth term
+            #+ class_loss # fifth term
         )
 
         return loss

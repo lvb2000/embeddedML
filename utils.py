@@ -268,6 +268,9 @@ def get_bboxes(
     train_idx = 0
 
     for batch_idx, (x, labels) in enumerate(loader):
+        # only check the first 100 batches
+        if batch_idx > 10:
+            break
         x = x.to(device)
         labels = labels.to(device)
 
