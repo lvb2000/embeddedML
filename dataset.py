@@ -101,3 +101,41 @@ class COCODataset(Dataset):
         if img.shape[0] == 1:
             img = img.repeat((3,1,1))
         return img, label_matrix
+
+class COCOTestSet(Dataset):
+    def get_index_dict(self):
+        index_dict = {}
+        for index,sample in enumerate(self.dataset):
+            index_dict[index] = sample.id
+        return index_dict
+    def __init__(self,transform=None):
+
+        self.transform = transform
+
+    def load_dataset(self):
+        self.dataset = fo.zoo.load_zoo_dataset(
+            "coco-2017",
+            split="test",
+            label_types=["detections"],
+            classes=["person"],
+            max_samples=hp["max_training_samples"],
+        )
+        self.idx_to_id = self.get_index_dict()
+    def __len__(self):
+        return len(self.dataset)
+    def __getitem__(self, idx):
+        # get image and label from dataset
+        id = self.idx_to_id[idx]
+        sample = self.dataset[id]
+        image_path = sample["filepath"]
+        img = Image.open(image_path)
+
+        # convert labels ratios to absolute box coordinates
+        boxes = []
+        if self.transform:
+            img, boxes = self.transform(img,boxes)
+
+        # if first dimenstion == 1 (grey scale image) then copy it into 3 channels
+        if img.shape[0] == 1:
+            img = img.repeat((3,1,1))
+        return img

@@ -57,9 +57,6 @@ def main():
         model.parameters(), lr=hp["lr"], weight_decay=hp["weight_decay"]
     )
     loss_fn = YoloLoss()
-    if hp["load_model"]:
-        load_checkpoint(torch.load(hp["load_model_file"]), model, optimizer)
-        #load_checkpoint(torch.load(hp["load_model_file"],map_location=torch.device('cpu')), model, optimizer)
 
     train_dataset = COCODataset(transform=transform)
     train_dataset.load_dataset()
@@ -69,16 +66,6 @@ def main():
     best_map = 0
 
     for epoch in range(hp["num_epochs"]):
-        #for x,y in train_loader:
-        #    x = x.to(hp["device"])
-        #    for idx in range(8):
-        #        bboxes = cellboxes_to_boxes(model(x))
-        #        real_boxes = cellboxes_to_boxes(y.flatten(start_dim=1))
-        #        bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
-        #        plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes,real_boxes[idx])
-
-        #   import sys
-        #  sys.exit()
 
         pred_boxes, target_boxes = get_bboxes(
             train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"]
