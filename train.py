@@ -90,16 +90,16 @@ def main():
         print(f"Train mAP: {train_mean_avg_prec}")
 
         #------------------- Validation Mean Average Precision -------------------#
-        test_pred_boxes, test_target_boxes = get_bboxes(
+        val_pred_boxes, val_target_boxes = get_bboxes(
             val_loader, model, iou_threshold=0.5, threshold=0.4, device=hp["device"]
         )
-        test_mean_avg_prec = mean_average_precision(
-            test_pred_boxes, test_target_boxes, iou_threshold=0.5, box_format="midpoint"
+        val_mean_avg_prec = mean_average_precision(
+            val_pred_boxes, val_target_boxes, iou_threshold=0.5, box_format="midpoint"
         )
-        print(f"Validation mAP: {test_mean_avg_prec}")
+        print(f"Validation mAP: {val_mean_avg_prec}")
 
         #------------------- Store mAP -------------------#
-        df = df.append({'train_mAP': train_mean_avg_prec, 'val_mAP': test_mean_avg_prec}, ignore_index=True)
+        df.loc[len(df)] = [train_mean_avg_prec,val_mean_avg_prec]
         df.to_csv('mAP.csv', index=False)
 
         #------------------- Checkpointing -------------------#
