@@ -99,10 +99,10 @@ class YOLOv1(nn.Module):
             # the linear layer is fully connected, which means it has many nodes to computed which is why i reduce the number of nodes with the linear layer from 4096 to 496
             # This can be further tuned maybe if the model is too large for the MAXIM board
             # 1024 is the output dimension of the last CNN layer * this is multiplied by S*S where S is the grid size the image has been split into
-            # This is done because the CNN logs at every patch of the grid individually
+            # This is done because the CNN looks at every patch of the grid individually
             nn.Linear(1024 * S * S, 496),
             # TODO: set later to 0.5
-            nn.Dropout(0.0),
+            nn.Dropout(hp['dropout']),
             nn.LeakyReLU(0.1),
             # S*S*(C+B*5): for every patch of the grid there are C different classes and B different boxes with 5 parameters
             # The 5 parameters are: x, y, w, h, confidence

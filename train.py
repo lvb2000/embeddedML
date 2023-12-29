@@ -32,7 +32,7 @@ class Compose(object):
             img, bboxes = t(img), bboxes
         return img, bboxes
 
-transform = Compose([transforms.Resize((448, 448)), transforms.ToTensor()])
+transform = Compose([transforms.Resize((hp['image_size'], hp['image_size'])), transforms.ToTensor()])
 
 def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
     loop = tqdm(train_loader, leave=True)
@@ -95,7 +95,7 @@ def main():
         """
         #------------------- Training Mean Average Precision -------------------#
         train_pred_boxes, train_target_boxes = get_bboxes(
-            train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"]
+            train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"], split_size=hp["S"]
         )
         train_mean_avg_prec = mean_average_precision(
             train_pred_boxes, train_target_boxes, iou_threshold=0.5, box_format="midpoint"
@@ -104,7 +104,7 @@ def main():
 
         #------------------- Validation Mean Average Precision -------------------#
         val_pred_boxes, val_target_boxes = get_bboxes(
-            val_loader, model, iou_threshold=0.5, threshold=0.4, device=hp["device"]
+            val_loader, model, iou_threshold=0.5, threshold=0.4, device=hp["device"], split_size=hp["S"]
         )
         val_mean_avg_prec = mean_average_precision(
             val_pred_boxes, val_target_boxes, iou_threshold=0.5, box_format="midpoint"
