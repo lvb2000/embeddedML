@@ -68,7 +68,7 @@ def main():
 
     #------------------- Init validation Dataset -------------------#
     val_dataset = COCODataset(transform=transform)
-    val_dataset.load_dataset("val")
+    val_dataset.load_dataset("validation")
     print(f"Validation samples: {len(val_dataset)}")
     val_loader = DataLoader(dataset=val_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"],
                               pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
