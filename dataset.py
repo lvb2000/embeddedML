@@ -78,7 +78,7 @@ class COCODataset(Dataset):
             if label["label"] != "person":
                 continue
             box = label["bounding_box"]
-            if box[2] <= 0.25 or box[3] == 0.25:
+            if box[2] <= 0.25 or box[3] <= 0.25:
                 continue
             x,y = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
