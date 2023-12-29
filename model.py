@@ -93,7 +93,7 @@ class YOLOv1(nn.Module):
         return nn.Sequential(*layers) # *layers unpacks the list of layers into the sequential function
 
     def _create_fcs(self):
-        S, B, C = hp['S'], hp['B'], hp['C']
+        S, B = hp['S'], hp['B']
         return nn.Sequential(
             nn.Flatten(),
             # the linear layer is fully connected, which means it has many nodes to computed which is why i reduce the number of nodes with the linear layer from 4096 to 496
@@ -106,7 +106,7 @@ class YOLOv1(nn.Module):
             nn.LeakyReLU(0.1),
             # S*S*(C+B*5): for every patch of the grid there are C different classes and B different boxes with 5 parameters
             # The 5 parameters are: x, y, w, h, confidence
-            nn.Linear(496, S * S * (C + B * 5))
+            nn.Linear(496, S * S * (B * 5))
         )
 
 def test():

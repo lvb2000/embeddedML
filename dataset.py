@@ -82,23 +82,21 @@ class COCODataset(Dataset):
                 continue
             x,y = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
-            boxes.append([1,x,y,w,h])
+            boxes.append([x,y,w,h])
         #self.print_sample(img, boxes)
         boxes = torch.tensor(boxes)
         if self.transform:
             img, boxes = self.transform(img,boxes)
-        label_matrix = torch.zeros((hp["S"],hp["S"],hp["C"]+5*hp["B"]))
+        label_matrix = torch.zeros((hp["S"],hp["S"],5*hp["B"]))
         for box in boxes:
-            class_label,x,y,width,height = box.tolist()
-            class_label = int(class_label)
+            x,y,width,height = box.tolist()
             i,j = int(hp["S"]*y),int(hp["S"]*x)
             x_cell,y_cell = hp["S"]*x-j, hp["S"]*y-i
             width_cell,height_cell = width*hp["S"], height*hp["S"]
-            if label_matrix[i,j,20] == 0:
-                label_matrix[i,j,20] = 1
+            if label_matrix[i,j,0] == 0:
+                label_matrix[i,j,0] = 1
                 box_coordinates = torch.tensor([x_cell,y_cell,width_cell,height_cell])
-                label_matrix[i,j,21:25] = box_coordinates
-                label_matrix[i,j,class_label] = 1
+                label_matrix[i,j,1:5] = box_coordinates
         # if first dimenstion == 1 (grey scale image) then copy it into 3 channels
         if img.shape[0] == 1:
             img = img.repeat((3,1,1))
