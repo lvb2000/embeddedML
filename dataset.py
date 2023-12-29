@@ -50,10 +50,10 @@ class COCODataset(Dataset):
 
         self.transform = transform
 
-    def load_dataset(self):
+    def load_dataset(self,kind="train"):
         self.dataset = fo.zoo.load_zoo_dataset(
             "coco-2017",
-            split="train",
+            split=kind,
             label_types=["detections"],
             classes=["person"],
             max_samples=hp["max_training_samples"],

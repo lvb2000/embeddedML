@@ -77,8 +77,8 @@ def main():
         #        bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
         #        plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes,real_boxes[idx])
 
-         #   import sys
-          #  sys.exit()
+        #   import sys
+        #  sys.exit()
 
         pred_boxes, target_boxes = get_bboxes(
             train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"]
