@@ -34,15 +34,15 @@ class Compose(object):
 
 transform = Compose([transforms.Resize((448, 448)), transforms.ToTensor()])
 
-def train_fn(train_loader, model, optimizer, loss_fn):
+def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
     loop = tqdm(train_loader, leave=True)
-    mean_loss = []
-
+    #------------------- Training -------------------#
+    mean_train_loss = []
     for (x, y) in loop:
         x, y = x.to(hp["device"]), y.to(hp["device"])
         out = model(x)
         loss = loss_fn(out, y)
-        mean_loss.append(loss.item())
+        mean_train_loss.append(loss.item())
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -50,7 +50,20 @@ def train_fn(train_loader, model, optimizer, loss_fn):
         # update progress bar
         loop.set_postfix(loss=loss.item())
 
-    print(f"Mean loss was {sum(mean_loss)/len(mean_loss)}")
+    print(f"Mean loss was {sum(mean_train_loss)/len(mean_train_loss)}")
+
+    #------------------- Validation -------------------#
+    model.eval()
+    mean_val_loss = []
+    with torch.no_grad():
+        for (x, y) in val_loader:
+            x, y = x.to(hp["device"]), y.to(hp["device"])
+            out = model(x)
+            loss = loss_fn(out, y)
+            mean_val_loss.append(loss.item())
+    model.train()
+    print(f"Mean validation loss was {sum(mean_val_loss)/len(mean_val_loss)}")
+
 
 def main():
     #------------------- Init model -------------------#
@@ -79,7 +92,7 @@ def main():
     df = pd.DataFrame(columns=['train_mAP', 'val_mAP'])
 
     for epoch in range(hp["num_epochs"]):
-
+        """
         #------------------- Training Mean Average Precision -------------------#
         train_pred_boxes, train_target_boxes = get_bboxes(
             train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"]
@@ -110,9 +123,9 @@ def main():
                 "optimizer": optimizer.state_dict(),
             }
             save_checkpoint(checkpoint, filename=hp["load_model_file"])
-
+        """
         #------------------- Training -------------------#
-        train_fn(train_loader, model, optimizer, loss_fn)
+        train_fn(train_loader,val_loader, model, optimizer, loss_fn)
 
 if __name__ == "__main__":
     main()
