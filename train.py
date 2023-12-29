@@ -62,22 +62,23 @@ def main():
         #load_checkpoint(torch.load(hp["load_model_file"],map_location=torch.device('cpu')), model, optimizer)
 
     train_dataset = COCODataset(transform=transform)
+    train_dataset.load_dataset()
     print(f"Training samples: {len(train_dataset)}")
     train_loader = DataLoader(dataset=train_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"], pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
 
     best_map = 0
 
     for epoch in range(hp["num_epochs"]):
-        for x,y in train_loader:
-            x = x.to(hp["device"])
-            for idx in range(8):
-                bboxes = cellboxes_to_boxes(model(x))
-                real_boxes = cellboxes_to_boxes(y.flatten(start_dim=1))
-                bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
-                plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes,real_boxes[idx])
+        #for x,y in train_loader:
+        #    x = x.to(hp["device"])
+        #    for idx in range(8):
+        #        bboxes = cellboxes_to_boxes(model(x))
+        #        real_boxes = cellboxes_to_boxes(y.flatten(start_dim=1))
+        #        bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
+        #        plot_image(x[idx].permute(1,2,0).to("cpu"), bboxes,real_boxes[idx])
 
-            import sys
-            sys.exit()
+         #   import sys
+          #  sys.exit()
 
         pred_boxes, target_boxes = get_bboxes(
             train_loader, model, iou_threshold=0.5, threshold=0.4,device=hp["device"]

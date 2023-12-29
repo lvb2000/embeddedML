@@ -47,6 +47,10 @@ class COCODataset(Dataset):
             index_dict[index] = sample.id
         return index_dict
     def __init__(self,transform=None):
+
+        self.transform = transform
+
+    def load_dataset(self):
         self.dataset = fo.zoo.load_zoo_dataset(
             "coco-2017",
             split="train",
@@ -54,9 +58,7 @@ class COCODataset(Dataset):
             classes=["person"],
             max_samples=hp["max_training_samples"],
         )
-        self.transform = transform
         self.idx_to_id = self.get_index_dict()
-
     def __len__(self):
         return len(self.dataset)
     def __getitem__(self, idx):
