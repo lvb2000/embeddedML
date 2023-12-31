@@ -93,4 +93,4 @@ class YoloLoss(nn.Module):
             + self.lambda_noobj * no_object_loss # fourth term
         )
 
-        return loss
+        return loss,self.lambda_coord * box_loss,object_loss,self.lambda_noobj * no_object_loss

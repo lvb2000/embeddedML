@@ -69,21 +69,17 @@ class COCODataset(Dataset):
         img = Image.open(image_path)
         # img_array = np.array(img)
         labels = sample["ground_truth"]["detections"]
-        # convert image
-
         # convert labels ratios to absolute box coordinates
         boxes = []
-        #count = 0
         for label in labels:
             if label["label"] != "person":
                 continue
             box = label["bounding_box"]
-            if box[2] <= 0.05 or box[3] <= 0.05:
+            if box[2] <= 0.1 or box[3] <= 0.1:
                 continue
             x,y = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
             boxes.append([x,y,w,h])
-        #self.print_sample(img, boxes)
         boxes = torch.tensor(boxes)
         if self.transform:
             img, boxes = self.transform(img,boxes)
@@ -139,3 +135,29 @@ class COCOTestSet(Dataset):
         if img.shape[0] == 1:
             img = img.repeat((3,1,1))
         return img
+
+def print_sample(self, img, boxes):
+    im = np.array(img)
+    height, width, _ = im.shape
+    # Create figure and axes
+    fig, ax = plt.subplots(1)
+    # Display the image
+    ax.imshow(im)
+    # box[0] is x midpoint, box[2] is width
+    # box[1] is y midpoint, box[3] is height
+    # Create a Rectangle potch
+    for box in boxes:
+        assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
+        upper_left_x = box[0]
+        upper_left_y = box[1]
+        rect = patches.Rectangle(
+            (upper_left_x * width, upper_left_y * height),
+            box[2] * width,
+            box[3] * height,
+            linewidth=1,
+            edgecolor="g",
+            facecolor="none",
+        )
+        # Add the patch to the Axes
+        ax.add_patch(rect)
+    plt.show()
