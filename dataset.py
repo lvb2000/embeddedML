@@ -78,7 +78,7 @@ class COCODataset(Dataset):
             if label["label"] != "person":
                 continue
             box = label["bounding_box"]
-            if box[2] <= 0.25 or box[3] <= 0.25:
+            if box[2] <= 0.05 or box[3] <= 0.05:
                 continue
             x,y = box[0]+box[2]/2, box[1]+box[3]/2
             w,h = box[2], box[3]
@@ -118,7 +118,7 @@ class COCOTestSet(Dataset):
             split="test",
             label_types=["detections"],
             classes=["person"],
-            max_samples=hp["max_training_samples"],
+            max_samples=20,
         )
         self.idx_to_id = self.get_index_dict()
     def __len__(self):

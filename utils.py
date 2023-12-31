@@ -215,7 +215,7 @@ def plot_image(image, boxes, real_boxes=None):
 
     # Create a Rectangle potch
     for box in boxes:
-        box = box[2:]
+        box = box[1:]
         assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
         upper_left_x = box[0] - box[2] / 2
         upper_left_y = box[1] - box[3] / 2
@@ -232,7 +232,7 @@ def plot_image(image, boxes, real_boxes=None):
 
     if real_boxes is not None:
         for box in real_boxes:
-            box = box[2:]
+            box = box[1:]
             assert len(box) == 4, "Got more values than in x, y, w, h, in a box!"
             upper_left_x = box[0] - box[2] / 2
             upper_left_y = box[1] - box[3] / 2

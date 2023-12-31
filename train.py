@@ -36,9 +36,10 @@ transform = Compose([transforms.Resize((hp['image_size'], hp['image_size'])), tr
 
 def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
     loop = tqdm(train_loader, leave=True)
+    ridx = torch.randint(0, len(train_loader), (1,)).item()
     #------------------- Training -------------------#
     mean_train_loss = []
-    for (x, y) in loop:
+    for batch_idx, (x, y) in enumerate(loop):
         x, y = x.to(hp["device"]), y.to(hp["device"])
         out = model(x)
         loss = loss_fn(out, y)
@@ -46,7 +47,11 @@ def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
+        if batch_idx == ridx:
+            for idx in range(8):
+                bboxes = cellboxes_to_boxes(out, S=hp["S"])
+                bboxes = non_max_suppression(bboxes[idx], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
+                plot_image(x[idx].permute(1, 2, 0).to("cpu"), bboxes)
         # update progress bar
         loop.set_postfix(loss=loss.item())
 
@@ -110,20 +115,20 @@ def main():
             val_pred_boxes, val_target_boxes, iou_threshold=0.5, box_format="midpoint"
         )
         print(f"Validation mAP: {val_mean_avg_prec}")
-
+        
         #------------------- Store mAP -------------------#
         df.loc[len(df)] = [train_mean_avg_prec,val_mean_avg_prec]
         df.to_csv('mAP.csv', index=False)
-
+        
         #------------------- Checkpointing -------------------#
-        if train_mean_avg_prec >= best_map:
-            best_map = train_mean_avg_prec
+        if val_mean_avg_prec >= best_map:
+            best_map = val_mean_avg_prec
             checkpoint = {
                 "state_dict": model.state_dict(),
                 "optimizer": optimizer.state_dict(),
             }
             save_checkpoint(checkpoint, filename=hp["load_model_file"])
-        """
+            """
         #------------------- Training -------------------#
         train_fn(train_loader,val_loader, model, optimizer, loss_fn)
 
