@@ -34,7 +34,7 @@ class Compose(object):
 
 transform = Compose([transforms.Resize((hp['image_size'], hp['image_size'])), transforms.ToTensor()])
 
-def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
+def train_fn(train_loader, model, optimizer, loss_fn):
     loop = tqdm(train_loader, leave=True)
     ridx = torch.randint(0, len(train_loader), (1,)).item()
     #------------------- Training -------------------#
@@ -58,16 +58,16 @@ def train_fn(train_loader,val_loader, model, optimizer, loss_fn):
     print(f"Mean loss was {sum(mean_train_loss)/len(mean_train_loss)}")
 
     #------------------- Validation -------------------#
-    model.eval()
-    mean_val_loss = []
-    with torch.no_grad():
-        for (x, y) in val_loader:
-            x, y = x.to(hp["device"]), y.to(hp["device"])
-            out = model(x)
-            loss = loss_fn(out, y)
-            mean_val_loss.append(loss.item())
-    model.train()
-    print(f"Mean validation loss was {sum(mean_val_loss)/len(mean_val_loss)}")
+    #model.eval()
+    #mean_val_loss = []
+    #with torch.no_grad():
+    #    for (x, y) in val_loader:
+    #        x, y = x.to(hp["device"]), y.to(hp["device"])
+    #        out = model(x)
+    #        loss = loss_fn(out, y)
+    #        mean_val_loss.append(loss.item())
+    #model.train()
+    #print(f"Mean validation loss was {sum(mean_val_loss)/len(mean_val_loss)}")
 
 
 def main():
@@ -85,11 +85,11 @@ def main():
     train_loader = DataLoader(dataset=train_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"], pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
 
     #------------------- Init validation Dataset -------------------#
-    val_dataset = COCODataset(transform=transform)
-    val_dataset.load_dataset("validation")
-    print(f"Validation samples: {len(val_dataset)}")
-    val_loader = DataLoader(dataset=val_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"],
-                              pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
+    #val_dataset = COCODataset(transform=transform)
+    #val_dataset.load_dataset("validation")
+    #print(f"Validation samples: {len(val_dataset)}")
+    #val_loader = DataLoader(dataset=val_dataset, batch_size=hp["batch_size"], num_workers=hp["num_worker"],
+    #                          pin_memory=hp["Pin_memory"], shuffle=True, drop_last=False)
 
     best_map = 0
 
@@ -106,7 +106,6 @@ def main():
             train_pred_boxes, train_target_boxes, iou_threshold=0.5, box_format="midpoint"
         )
         print(f"Train mAP: {train_mean_avg_prec}")
-
         #------------------- Validation Mean Average Precision -------------------#
         val_pred_boxes, val_target_boxes = get_bboxes(
             val_loader, model, iou_threshold=0.5, threshold=0.4, device=hp["device"], split_size=hp["S"]
@@ -130,7 +129,7 @@ def main():
             save_checkpoint(checkpoint, filename=hp["load_model_file"])
             """
         #------------------- Training -------------------#
-        train_fn(train_loader,val_loader, model, optimizer, loss_fn)
+        train_fn(train_loader, model, optimizer, loss_fn)
 
 if __name__ == "__main__":
     main()
