@@ -25,6 +25,25 @@ architecture_config = [
     (3, 1024, 1, 1),
 ]
 
+Tinyissimo_config = [
+    # Tuple: (kernel_size, num_filters, stride, padding)
+    (3, 16, 1, 1),
+    (3, 16, 1, 1),
+    "M",
+    (3, 16, 1, 1),
+    (3, 32, 1, 1),
+    "M",
+    (3, 32, 1, 1),
+    (3, 64, 1, 1),
+    "M",
+    (3, 64, 1, 1),
+    (3, 64, 1, 1),
+    "M",
+    (3, 128, 1, 1),
+    (3, 128, 1, 1),
+    "M",
+]
+
 class CNNBlock(nn.Module):
     def __init__(self, in_channels, out_channels, **kwargs):
         super(CNNBlock, self).__init__()
@@ -38,9 +57,9 @@ class CNNBlock(nn.Module):
         return self.leakyrelu(self.batchnorm(self.conv(x)))
 
 class YOLOv1(nn.Module):
-    def __init__(self, in_channels=3):
+    def __init__(self, in_channels=1):
         super(YOLOv1, self).__init__()
-        self.architecture = architecture_config
+        self.architecture = Tinyissimo_config
         self.in_channels = in_channels
         self.darknet = self._create_conv_layers()
         self.fcs = self._create_fcs()
@@ -100,13 +119,10 @@ class YOLOv1(nn.Module):
             # This can be further tuned maybe if the model is too large for the MAXIM board
             # 1024 is the output dimension of the last CNN layer * this is multiplied by S*S where S is the grid size the image has been split into
             # This is done because the CNN looks at every patch of the grid individually
-            nn.Linear(1024 * S * S, 496),
-            # TODO: set later to 0.5
-            nn.Dropout(hp['dropout']),
+            nn.Linear(128 * 2 * 2, 256),
             nn.LeakyReLU(0.1),
-            # S*S*(C+B*5): for every patch of the grid there are C different classes and B different boxes with 5 parameters
-            # The 5 parameters are: x, y, w, h, confidence
-            nn.Linear(496, S * S * (B * 5))
+            nn.Dropout(hp['dropout']),
+            nn.Linear(256, S * S * (B * 5)),
         )
 
 def test():
