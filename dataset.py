@@ -11,8 +11,6 @@ import matplotlib.patches as patches
 class COCODataset(Dataset):
     def print_sample(self,img,boxes):
         im = np.array(img)
-        if len(im.shape) == 2:
-            im = np.repeat(im[:,:,np.newaxis],3,axis=2)
         height, width, _ = im.shape
 
         # Create figure and axes
@@ -66,7 +64,7 @@ class COCODataset(Dataset):
         id = self.idx_to_id[idx]
         sample = self.dataset[id]
         image_path = sample["filepath"]
-        img = Image.open(image_path)
+        img = Image.open(image_path).convert('L')
         # img_array = np.array(img)
         labels = sample["ground_truth"]["detections"]
         # convert labels ratios to absolute box coordinates
@@ -93,9 +91,6 @@ class COCODataset(Dataset):
                 label_matrix[i,j,0] = 1
                 box_coordinates = torch.tensor([x_cell,y_cell,width_cell,height_cell])
                 label_matrix[i,j,1:5] = box_coordinates
-        # if first dimenstion == 1 (grey scale image) then copy it into 3 channels
-        if img.shape[0] == 1:
-            img = img.repeat((3,1,1))
         return img, label_matrix
 
 class COCOTestSet(Dataset):

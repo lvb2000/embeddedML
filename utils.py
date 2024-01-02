@@ -208,7 +208,7 @@ def plot_image(image, boxes, real_boxes=None):
     # Create figure and axes
     fig, ax = plt.subplots(1)
     # Display the image
-    ax.imshow(im)
+    ax.imshow(im,cmap='gray', vmin=0, vmax=255)
 
     # box[0] is x midpoint, box[2] is width
     # box[1] is y midpoint, box[3] is height
@@ -364,6 +364,7 @@ def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
 
 
 def load_checkpoint(checkpoint, model, optimizer):
+
     print("=> Loading checkpoint")
     model.load_state_dict(checkpoint["state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer"])
