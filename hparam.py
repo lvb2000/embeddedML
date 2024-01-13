@@ -15,7 +15,7 @@ hparam = {
     'Pin_memory': True,
     'load_model': True,
     'load_model_file': 'overfit.pth.tar',
-    'max_training_samples': 100,
+    'max_training_samples': 10000,
     # loss config
     'lambda_coord': 5,
     'lambda_noobj': 0.5,
